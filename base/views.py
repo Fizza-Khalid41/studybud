@@ -68,12 +68,14 @@ def home(request):
     )
     topics = Topic.objects.all()
     room_count = rooms.count()
+    total_rooms = Room.objects.all().count()
     room_messages = Message.objects.filter(Q(room__topic__name__icontains=q))
 
     context = {
         "rooms": rooms,
         "topics": topics,
         "room_count": room_count,
+        "total_rooms": total_rooms,
         "room_messages": room_messages,
     }
     return render(request, "base/home.html", context)
@@ -119,7 +121,9 @@ def createRoom(request):
     if request.method == "POST":
         form = RoomForm(request.POST)
         if form.is_valid():
-            form.save()
+            room = form.save(commit=False)
+            room.host = request.user
+            room.save()
             return redirect("home")
 
     context = {"form": form}
