@@ -51,10 +51,14 @@ def registerPage(request):
             login(request, user)
             return redirect("home")
         else:
-            messages.error(request, "An error occurred during registration")
+            # Show all form errors on screen
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
 
     context = {"form": form}
     return render(request, "base/login_register.html", context)
+
 
 
 def home(request):
